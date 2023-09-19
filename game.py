@@ -1,12 +1,12 @@
-import pygame
+import pygame as pg
 import random
 from enum import Enum
 from collections import namedtuple
 import numpy as np
 
-pygame.init()
-#font = pygame.font.Font('arial.ttf', 25)
-#font = pygame.font.SysFont('arial', 25)
+pg.init()
+font = pg.font.Font(pg.font.get_default_font(), 24)
+#font = pg.font.SysFont('arial', 25)
 
 class Direction(Enum):
     RIGHT = 1
@@ -33,9 +33,9 @@ class SnakeGameAI:
         self.w = w
         self.h = h
         # init display
-        self.display = pygame.display.set_mode((self.w, self.h))
-        pygame.display.set_caption('Snake')
-        self.clock = pygame.time.Clock()
+        self.display = pg.display.set_mode((self.w, self.h))
+        pg.display.set_caption('Snake')
+        self.clock = pg.time.Clock()
         self.reset()
 
 
@@ -79,14 +79,14 @@ class SnakeGameAI:
         self.display.fill(BLACK)
 
         for pt in self.snake:
-            pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-            pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+BLOCK_OFFSET, pt.y+BLOCK_OFFSET, BLOCK_SIZE - 2*BLOCK_OFFSET, BLOCK_SIZE - 2*BLOCK_OFFSET))
+            pg.draw.rect(self.display, BLUE1, pg.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+            pg.draw.rect(self.display, BLUE2, pg.Rect(pt.x+BLOCK_OFFSET, pt.y+BLOCK_OFFSET, BLOCK_SIZE - 2*BLOCK_OFFSET, BLOCK_SIZE - 2*BLOCK_OFFSET))
 
-        pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
+        pg.draw.rect(self.display, RED, pg.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
 
         text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
-        pygame.display.flip()
+        pg.display.flip()
 
 
     def _move(self, action):
@@ -123,9 +123,9 @@ class SnakeGameAI:
     def play_step(self, action):
         self.frame_iteration += 1
         # 1. collect user input
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
                 quit()
         
         # 2. move
