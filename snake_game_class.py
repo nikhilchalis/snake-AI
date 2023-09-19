@@ -3,10 +3,10 @@ import numpy as np
 import random
 from enum import Enum
 from collections import namedtuple
+
 pg.init()
 font = pg.font.Font(pg.font.get_default_font(), 24)
-# credit goes to https://github.com/vedantgoswami/SnakeGameAI/blob/main/snake_game.py
-# I didn't want to just copy and paste without understanding, but it ended up being a copy anyhow
+
 
 class Direction(Enum):
     RIGHT = 1
