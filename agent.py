@@ -7,6 +7,7 @@ from game import SnakeGameAI, Direction, Point, BLOCK_SIZE
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
+EPSILON_THRESHOLD = 80
 
 class Agent:
     def __init__(self):
@@ -14,22 +15,88 @@ class Agent:
         self.epsilon = 0 # controls randomness
         self.gamma = 0 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # if exceeded, automatically removes elements from the left for us
-        pass
+        self.model = None # TODO
+        self.trainer = None # TODO
 
     def get_state(self, game):
-        pass
+        head = game.snake[0]
+
+        point_l = Point(head.x - BLOCK_SIZE, head.y)
+        point_r = Point(head.x + BLOCK_SIZE, head.y)
+        point_u = Point(head.x, head.y + BLOCK_SIZE)
+        point_d = Point(head.x, head.y - BLOCK_SIZE)
+
+        # returns T or F Boolean based on which direction the snake is currently turned to
+        dir_l = (game.direction == Direction.LEFT)
+        dir_r = (game.direction == Direction.RIGHT)
+        dir_u = (game.direction == Direction.UP)
+        dir_d = (game.direction == Direction.DOWN)
+
+        # calculates 11 value state vector:
+        state = [
+            # Danger straight - one Boolean
+            (dir_r and game.is_collision(point_r)) or 
+            (dir_l and game.is_collision(point_l)) or 
+            (dir_u and game.is_collision(point_u)) or 
+            (dir_d and game.is_collision(point_d)),
+
+            # Danger right - one Boolean
+            (dir_u and game.is_collision(point_r)) or 
+            (dir_d and game.is_collision(point_l)) or 
+            (dir_l and game.is_collision(point_u)) or 
+            (dir_r and game.is_collision(point_d)),
+
+            # Danger left - one Boolean
+            (dir_d and game.is_collision(point_r)) or 
+            (dir_u and game.is_collision(point_l)) or 
+            (dir_r and game.is_collision(point_u)) or 
+            (dir_l and game.is_collision(point_d)),
+            
+            # Move direction - four Booleans
+            dir_l,
+            dir_r,
+            dir_u,
+            dir_d,
+            
+            # Food location - four Booleans
+            game.food.x < game.head.x,  # food left
+            game.food.x > game.head.x,  # food right
+            game.food.y < game.head.y,  # food up
+            game.food.y > game.head.y  # food down
+            ]
+
+        return np.array(state, dtype=int) #converts boolean values to integers
 
     def remember(self, state, action, reward, next_state, done):
-        pass
+        self.memory.append((state, action, reward, next_state, done)) # pops left if MAX_MEMORY is reached
 
     def train_long_memory(self):
-        pass
+        if len(self.memory) > BATCH_SIZE:
+            mini_sample = random.sample(self.memory, BATCH_SIZE) # returns list of tuples
+        else:
+            mini_sample = self.memory
 
-    def train_short_memory(self):
-        pass
+        states, actions, rewards, next_states, dones = zip(*mini_sample)
+        self.trainer.train_step(states, actions, rewards, next_states, dones)
+
+    def train_short_memory(self, state, action, reward, next_state, done):
+        self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        pass
+        # random moves: tradeoff between exploration / exploitation
+        # initially want to randomly explore, later want to be less random as we get better
+        self.epsilon = EPSILON_THRESHOLD - self.n_games
+        final_move = [0, 0, 0]
+        if random.randint(0, 200) < self.epsilon:
+            move = random.randint(0, 2)
+            final_move[move] = 1 # picks a random direction from L, F, R
+        else:
+            state0 = torch.tensor(state, dtype=torch.float)
+            prediction = self.model.predict(state0)k
+            move = torch.argmax(prediction).item()# .item() converts to one number
+            final_move[move] = 1
+
+        return final_move
 
 def train():
     plot_scores = []
