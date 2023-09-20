@@ -92,7 +92,7 @@ class Agent:
             final_move[move] = 1 # picks a random direction from L, F, R
         else:
             state0 = torch.tensor(state, dtype=torch.float)
-            prediction = self.model.predict(state0)k
+            prediction = self.model.predict(state0)
             move = torch.argmax(prediction).item()# .item() converts to one number
             final_move[move] = 1
 
