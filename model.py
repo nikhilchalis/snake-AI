@@ -15,7 +15,7 @@ class Linear_QNet(nn.Module):
         x = self.linear2(x)
         return x
     
-    def save(self, fil_ename='model.pth'):
+    def save(self, file_name='model.pth'):
         model_folder_path = './model'
         if not os.path.exists(model_folder_path):
             os.makedirs(model_folder_path)
@@ -44,7 +44,7 @@ class QTrainer:
             state = torch.unsqueeze(state, 0)
             next_state = torch.unsqueeze(next_state, 0)
             action = torch.unsqueeze(action, 0)
-            reward = torch.tensor(reward, 0)
+            reward = torch.unsqueeze(reward, 0)
             done = (done, )
 
         # 1: predicted Q values with current state
@@ -65,7 +65,11 @@ class QTrainer:
 
         self.optimiser.zero_grad()
         loss = self.criterion(target, pred) # Q_new and Q
-        
+        loss.backward()
+
+        self.optimiser.step()
+
+
 
 
         

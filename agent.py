@@ -4,6 +4,7 @@ import numpy as np
 from collections import deque
 from game import SnakeGameAI, Direction, Point, BLOCK_SIZE
 from model import Linear_QNet, QTrainer
+from helper import plot
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -24,8 +25,8 @@ class Agent:
 
         point_l = Point(head.x - BLOCK_SIZE, head.y)
         point_r = Point(head.x + BLOCK_SIZE, head.y)
-        point_u = Point(head.x, head.y + BLOCK_SIZE)
-        point_d = Point(head.x, head.y - BLOCK_SIZE)
+        point_u = Point(head.x, head.y - BLOCK_SIZE)
+        point_d = Point(head.x, head.y + BLOCK_SIZE)
 
         # returns T or F Boolean based on which direction the snake is currently turned to
         dir_l = (game.direction == Direction.LEFT)
@@ -135,7 +136,11 @@ def train():
 
             print('Game ', agent.n_games, 'Score ', score, 'Record ', record)
 
-            # TODO: Plotting
+            plot_scores.append(score)
+            total_score += score
+            mean_score = total_score / agent.n_games
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)
 
 
 
