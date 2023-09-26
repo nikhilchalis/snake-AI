@@ -8,8 +8,8 @@ from helper import plot
 
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
-LR = 0.01
-EPSILON_THRESHOLD = 30
+LR = 0.001
+EPSILON_THRESHOLD = 120
 
 class Agent:
     def __init__(self):
@@ -17,7 +17,7 @@ class Agent:
         self.epsilon = 0 # controls randomness
         self.gamma = 0.9 # discount rate, must be > 0 and < 1
         self.memory = deque(maxlen=MAX_MEMORY) # if exceeded, automatically removes elements from the left for us
-        self.model = Linear_QNet(11, 256, 64, 3)
+        self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -106,7 +106,7 @@ def train():
     total_score = 0
     record = 0
     agent = Agent()
-    game = SnakeGameAI(w=320, h=240)
+    game = SnakeGameAI()
     while True:
         # get old state
         state_old = agent.get_state(game)
